@@ -21,3 +21,12 @@ You can catch the exception raised for more details into the process exceptions:
     except ErrorInProcessException, e:
         print.e.errors
 
+# Installation
+
+Using setuptools:
+
+    python setup.py install
+
+Using pip:
+
+    pip install py-parallel
