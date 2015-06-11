@@ -1,5 +1,7 @@
 # PyParallel
 
+[![Build Status](https://travis-ci.org/Shapeways/py-parallel.svg?branch=master)](https://travis-ci.org/Shapeways/py-parallel)
+
 Runs a series of functions in parallel processes. Return values are ordered by the order in which their functions
 were passed.
 
