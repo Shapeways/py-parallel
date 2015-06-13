@@ -11,7 +11,7 @@ were passed.
     )
 
 If an exception is raised within one of the processes, that exception will be caught at the process
-level and raised by the parent process as an ErrorInProcessException, which will track all errors raised in all
+level and raised by the parent process as an ErrorInProcessException, which will save all errors raised across
 processes.
 
 You can catch the exception raised for more details into the process exceptions:
@@ -19,7 +19,7 @@ You can catch the exception raised for more details into the process exceptions:
     try:
         val1, val2 = run_parallel(fn1, fn2)
     except ErrorInProcessException, e:
-        print.e.errors
+        print e.errors
 
 # Installation
 
