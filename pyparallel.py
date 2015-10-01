@@ -1,5 +1,6 @@
 
 from multiprocessing import Process, Queue
+from threading import Thread
 import warnings
 
 
@@ -15,14 +16,13 @@ class ErrorInProcessException(RuntimeError):
         return '{}({}, {})'.format(self.__class__.__name__, self.message, self.errors)
 
 
-def run_parallel(*functions):
+def run_parallel(functions, multiprocess=False):
     """Runs a series of functions in parallel. Return values are ordered by the order in which their functions
     were passed.
 
-        >>> val1, val2 = run_parallel(
+        >>> val1, val2 = run_parallel([
         >>>     lambda: 1 + 1
-        >>>     lambda: 0
-        >>> )
+        >>>     lambda: 0])
 
     If an exception is raised within one of the processes, that exception will be caught at the process
     level and raised by the parent process as an ErrorInProcessException, which will track all errors raised in all
@@ -31,16 +31,18 @@ def run_parallel(*functions):
     You can catch the exception raised for more details into the process exceptions:
 
         >>> try:
-        >>>     val1, val2 = run_parallel(fn1, fn2)
+        >>>     val1, val2 = run_parallel([fn1, fn2])
         >>> except ErrorInProcessException, e:
         >>>     print.e.errors
 
-    @param functions: The functions to run specified as individual arguments
+    @param functions: A list of functions to execute
+    @param multiprocess: By default, functions are run in threads. If set to True, functions will each be run in
+    their own processes. 
     @return: List of results for those functions. Unpacking is recommended if you do not need to iterate over the
     results as it enforces the number of functions you pass in.
 
-        >>> val1, val2 = run_parallel(fn1, fn2, fn3)  # Will raise an error
-        >>> vals = run_parallel(fn1, fn2, fn3)  # Will not raise an error
+        >>> val1, val2 = run_parallel([fn1, fn2, fn3])  # Will raise an error
+        >>> vals = run_parallel([fn1, fn2, fn3])  # Will not raise an error
 
     @raise: ErrorInProcessException
     """
@@ -58,9 +60,11 @@ def run_parallel(*functions):
     errors = Queue()
     queue = Queue()
 
+    pool_class = Process if multiprocess else Thread
+
     jobs = list()
     for i, function in enumerate(functions):
-        jobs.append(Process(target=target(function), args=(queue, errors, i)))
+        jobs.append(pool_class(target=target(function), args=(queue, errors, i)))
 
     [job.start() for job in jobs]
     [job.join() for job in jobs]

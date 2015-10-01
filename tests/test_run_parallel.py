@@ -17,14 +17,16 @@ class TestRunParallel(unittest.TestCase):
         def funtion_error():
             raise ValueError('Error in values!')
 
-        try:
-            val1, val2 = run_parallel(
-                function_no_error,
-                funtion_error
-            )
-        except Exception, e:
-            self.assertIsInstance(e, ErrorInProcessException)
-            self.assertEqual(1, len(e.errors))
+        for use_multiprocess in (True, False):
+
+            try:
+                val1, val2 = run_parallel([
+                    function_no_error,
+                    funtion_error
+                ], multiprocess=use_multiprocess)
+            except Exception, e:
+                self.assertIsInstance(e, ErrorInProcessException)
+                self.assertEqual(1, len(e.errors))
 
     def test_return_value_order(self):
         """Tests that return values are returned in the order the functions are passed to run_parallel"""
@@ -44,14 +46,15 @@ class TestRunParallel(unittest.TestCase):
             time.sleep(0.3)
             return 4
 
-        val1, val2, val3, val4 = run_parallel(
-            return_second,
-            return_first,
-            return_third,
-            return_fourth
-        )
+        for use_multiprocess in (True, False):
 
-        self.assertEqual(val1, 2)
-        self.assertEqual(val2, 1)
-        self.assertEqual(val3, 3)
-        self.assertEqual(val4, 4)
+            val1, val2, val3, val4 = run_parallel([
+                return_second,
+                return_first,
+                return_third,
+                return_fourth], multiprocess=use_multiprocess)
+
+            self.assertEqual(val1, 2)
+            self.assertEqual(val2, 1)
+            self.assertEqual(val3, 3)
+            self.assertEqual(val4, 4)
