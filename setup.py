@@ -5,7 +5,7 @@ from setuptools import setup
 setup(
     name='py-parallel',
     description='Utility for simple asynchronous function calls',
-    version='0.1.0',
+    version='1.0.0',
     author='Shapeways',
     author_email='api@shapeways.com',
     url='http://github.com/Shapeways/py-parallel',
